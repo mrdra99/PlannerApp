@@ -10,7 +10,10 @@
     <MudAppBar Elevation="1">
         @* Barra in alto (AppBar) con pulsante, scommentare per attivare. *@
         @*<MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@DrawerToggle" />*@
-        <MudText Typo="Typo.h5" Class="ml-3">Planner</MudText>
+
+        @* <MudText Typo="Typo.h5" Class="ml-3">Planner</MudText> *@
+        <img src="/images/plannerlogo.png" alt="Logo Planner" style="height: 35px; margin-left: 12px;" />
+
         <MudSpacer />               @* Spazio flessibile per spingere i pulsanti a destra *@
         <MudIconButton Icon="@DarkLightModeButtonIcon"
                        Color="Color.Inherit"
@@ -38,7 +41,7 @@
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
     <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
+    <span class="dismiss">??</span>
 </div>
 
 @code {
@@ -49,13 +52,28 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
+    }
 
-        _theme = new()
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        _theme = new MudTheme
         {
+            // 1. Palette obbligatorie
             PaletteLight = _lightPalette,
             PaletteDark = _darkPalette,
-            LayoutProperties = new LayoutProperties()
+
+            // 2. Extra opzionali (sicuri)
+            LayoutProperties = new LayoutProperties
+            {
+                DefaultBorderRadius = "4px",
+                AppbarHeight = "64px"
+            }
         };
+
+        // Aggiungi ombre personalizzate SOLO se necessario
+        _theme.Shadows.Elevation[1] = "0px 1px 3px rgba(0,0,0,0.12)"; // Esempio
     }
 
     private void DrawerToggle()
@@ -68,49 +86,94 @@
         _isDarkMode = !_isDarkMode;
     }
 
-    private readonly PaletteLight _lightPalette = new()
-    {
-        Black = "#110e2d",
-        AppbarText = "#424242",
-        AppbarBackground = "rgba(255,255,255,0.8)",
-        DrawerBackground = "#ffffff",
-        GrayLight = "#e8e8e8",
-        GrayLighter = "#f9f9f9",
-    };
-
+    // Paletta per la Dark Mode (Modalità Scura)
+    // Progettata per essere riposante per gli occhi in ambienti con poca luce, con accenti vivaci.
     private readonly PaletteDark _darkPalette = new()
     {
-        Primary = "#7e6fff",
-        Surface = "#1e1e2d",
-        Background = "#1a1a27",
-        BackgroundGray = "#151521",
-        AppbarText = "#92929f",
-        AppbarBackground = "rgba(26,26,39,0.8)",
-        DrawerBackground = "#1a1a27",
-        ActionDefault = "#74718e",
-        ActionDisabled = "#9999994d",
-        ActionDisabledBackground = "#605f6d4d",
-        TextPrimary = "#b2b0bf",
-        TextSecondary = "#92929f",
-        TextDisabled = "#ffffff33",
-        DrawerIcon = "#92929f",
-        DrawerText = "#92929f",
-        GrayLight = "#2a2833",
-        GrayLighter = "#1e1e2d",
-        Info = "#4a86ff",
-        Success = "#3dcb6c",
-        Warning = "#ffb545",
-        Error = "#ff3f5f",
-        LinesDefault = "#33323e",
-        TableLines = "#33323e",
-        Divider = "#292838",
-        OverlayLight = "#1e1e2d80",
+        Primary = "#8A63FF",    // Viola vibrante: colore principale per bottoni, icone attive.
+        Secondary = "#00D4FF",  // Turchese brillante: colore secondario per elementi interattivi o highlight.
+        Tertiary = "#FF6BEF",   // Rosa acceso: per accenti molto specifici o stati di notifica/attenzione.
+
+        // Colori di sfondo per profondità e gerarchia
+        Surface = "#1F1F2F",    // Sfondo per schede, card, modali (leggermente più chiaro del background).
+        Background = "#1A1A24", // Sfondo principale dell'applicazione.
+        BackgroundGray = "#151520", // Per aree secondarie o sezioni distinte.
+        Dark = "#0A0A10",       // Nero più profondo per elementi a basso contrasto o bordi interni.
+
+        // Colori dell'AppBar
+        AppbarText = "#E0E0E0", // Testo sulla barra superiore.
+        AppbarBackground = "rgba(30,30,46,0.85)", // Sfondo con leggera trasparenza per un effetto moderno.
+
+        // Colori del Drawer (sidebar)
+        DrawerBackground = "#1F1F2F", // Sfondo del cassetto laterale (uguale a Surface per coerenza).
+        DrawerIcon = "#8A63FF", // Icone nel drawer (match con Primary per coerenza).
+        DrawerText = "#C0C0E0", // Testo nel drawer.
+
+        // Testo e azioni generiche
+        TextPrimary = "#F0F0FF",    // Testo principale (bianco-bluastro per morbidezza).
+        TextSecondary = "#C0C0E0",  // Testo secondario o descrittivo (grigio-blu chiaro).
+        TextDisabled = "#6A6A7A",   // Testo per elementi disabilitati (più visibile su sfondi scuri).
+        ActionDefault = "#A0A0C0",  // Colore base per icone/testo di azioni non evidenziate.
+        ActionDisabled = "#6A6A7A", // Colore per azioni disabilitate (più chiaro per leggibilità).
+        ActionDisabledBackground = "#303040", // Sfondo per azioni disabilitate.
+
+        // Interattività
+        HoverOpacity = 0.1, // Opacità dello sfondo al hover (10%).
+
+        // Linee, divisori e overlay
+        LinesDefault = "#3A3A4A", // Colore predefinito per linee e bordi.
+        TableLines = "#3A3A4A",   // Linee delle tabelle.
+        Divider = "#3A3A4A",      // Divisori.
+        OverlayLight = "#252538CC", // Overlay per modali/popover.
+
+        // Colori funzionali (Feedback)
+        Info = "#4A8AFF",   // Blu per informazioni.
+        Success = "#3DDB8C",// Verde per successo.
+        Warning = "#FFA726",// Arancione per avviso.
+        Error = "#FF4D6D"   // Rosso per errore.
+    };
+
+    // Paletta per la Light Mode (Modalità Chiara)
+    // Progettata per essere luminosa e pulita, con contrasti sufficienti per la leggibilità.
+    private readonly PaletteLight _lightPalette = new()
+    {
+        Primary = "#5E35B1",    // Viola profondo: colore principale per bottoni, icone attive.
+        Secondary = "#00ACC1",  // Turchese: colore secondario per elementi interattivi o highlight.
+        // Puoi aggiungere un Tertiary qui se necessario, ad esempio un rosa pastello chiaro
+        // Tertiary = "#FFC0CB", // Esempio: un rosa chiaro se vuoi un accento caldo
+
+        // Colori di sfondo
+        Surface = "#FFFFFF",    // Sfondo per schede, card, modali (bianco puro o quasi).
+        Background = "#F5F6FA", // Sfondo principale dell'applicazione (grigio/blu molto tenue).
+        GrayLight = "#E0E0EA",  // Grigio con sfumatura blu (per bordi o elementi di sfondo più scuri).
+        GrayLighter = "#F0F0F5",// Grigio più chiaro per aree secondarie.
+
+        // Colori dell'AppBar
+        Black = "#1A1A2E",      // Blu scuro invece di nero puro per un contrasto più morbido.
+        AppbarText = "#424242", // Testo sulla barra superiore.
+        AppbarBackground = "rgba(255,255,255,0.9)", // Bianco semi-trasparente.
+
+        // Colori del Drawer (sidebar)
+        DrawerBackground = "#FFFFFF", // Sfondo del cassetto laterale.
+
+        // Testo e azioni generiche
+        TextPrimary = "#1A1A2E",    // Testo principale (bluastro scuro).
+        TextSecondary = "#5A5A7A",  // Testo secondario o descrittivo.
+
+        // Linee, divisori e overlay
+        LinesDefault = "#E0E0EA",   // Colore predefinito per linee e bordi.
+        Divider = "#D0D0DA",        // Divisori (leggermente più scuro per maggiore visibilità).
+
+        // Colori funzionali (Feedback) - mantenere coerenza visiva con la Dark Mode
+        Info = "#4A8AFF",   // Blu per informazioni.
+        Success = "#3DDB8C",// Verde per successo.
+        Warning = "#FFA726",// Arancione per avviso.
+        Error = "#FF4D6D"   // Rosso per errore.
     };
 
     public string DarkLightModeButtonIcon => _isDarkMode switch
     {
-        true => Icons.Material.Rounded.AutoMode,
-        false => Icons.Material.Outlined.DarkMode,
+        true => Icons.Material.Filled.LightMode,  // Sole quando in dark mode
+        false => Icons.Material.Filled.DarkMode   // Luna quando in light mode
     };
 }
-
