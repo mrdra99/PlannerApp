@@ -1,39 +1,6 @@
-﻿@* Components/Routes.razor *@
-@using Microsoft.AspNetCore.Components.Routing
-@using PlannerApp.Components.Layout
-@using PlannerApp.Components
-@using PlannerApp.Components.Pages
-
-@* Qui includi il componente Splash Screen, controllando la sua visibilità *@
-@if (showSplashScreen)
-{
-    <SplashScreen />
-}
-
-<Router AppAssembly="@typeof(MauiProgram).Assembly">
+﻿<Router AppAssembly="@typeof(MauiProgram).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
-    <NotFound>
-        <LayoutView Layout="@typeof(Layout.MainLayout)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
 </Router>
-
-@code {
-    private bool showSplashScreen = true;
-
-    protected override async Task OnInitializedAsync()
-    {
-        // Questo metodo viene chiamato una volta all'inizializzazione del componente Routes.
-        // Simula il tempo di caricamento necessario per l'app.
-        await Task.Delay(3000); // Puoi aumentare o diminuire questo valore.
-
-        // Una volta che il "caricamento" è finito, imposta showSplashScreen su false.
-        // Questo farà sì che Blazor non renderizzi più il componente SplashScreen.
-        showSplashScreen = false;
-        StateHasChanged(); // Forzi il re-rendering del componente Routes per applicare la modifica
-    }
-}

@@ -12,10 +12,6 @@
             https://go.microsoft.com/fwlink/?linkid=2282329
         -->
 
-            <Style TargetType="BlazorWebView">
-                <Setter Property="BackgroundColor" Value="#1A1A24" />
-            </Style>
-
         </ResourceDictionary>
     </Application.Resources>
 </Application>
