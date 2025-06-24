@@ -3,9 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:PlannerApp"
              xmlns:components="clr-namespace:PlannerApp.Components"
-             x:Class="PlannerApp.MainPage">
+             x:Class="PlannerApp.MainPage"
+             BackgroundColor="#1A1A24">
 
-    <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html">
+    <BlazorWebView x:Name="blazorWebView" 
+                   HostPage="wwwroot/index.html"
+                   BackgroundColor="#1A1A24">
         <BlazorWebView.RootComponents>
             <RootComponent Selector="#app" ComponentType="{x:Type components:Routes}" />
         </BlazorWebView.RootComponents>
