@@ -1,6 +1,39 @@
-﻿<Router AppAssembly="@typeof(MauiProgram).Assembly">
+﻿@using Microsoft.AspNetCore.Components.Routing
+@using PlannerApp.Components.Layout
+@using PlannerApp.Components
+@using PlannerApp.Components.Pages
+
+@* Includo il componente Splash Screen, controllando la sua visibilità *@
+@if (showSplashScreen)
+{
+    <SplashScreen />
+}
+
+<Router AppAssembly="@typeof(MauiProgram).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(Layout.MainLayout)">
+            <p role="alert">Sorry, there's nothing at this address.</p>
+        </LayoutView>
+    </NotFound>
 </Router>
+
+@code {
+    private bool showSplashScreen = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Aspetta che MudBlazor sia completamente inizializzato
+        await Task.Delay(1500); // Minimo per l'UX
+
+        // Poi aspetta che il primo render sia completo
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(500);
+
+        showSplashScreen = false;
+        StateHasChanged();
+    }
+}
