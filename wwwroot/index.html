@@ -11,21 +11,121 @@
     <link rel="icon" href="data:,">
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
-</head>
+    <style>
+        /* Allora, questa è la nostra "coperta di Linus" iniziale.
+           Deve coprire TUTTO lo schermo (fixed, 100vw/vh) e stare
+           sopra ogni cosa (z-index assurdo). Il colore background è cruciale
+           perché è la prima cosa che si vede.
+           Display flex e justify/align center? Ovvio, così il logo sta al centro
+           senza sbattimenti di margini o posizionamenti assoluti complicati.
+           La font Roboto, la mettiamo qui perché ci serve anche per la splash. */
+        #initial-splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #F5F6FA; /* Il nostro bianco sporco, o quello che è */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999; /* DEVE essere il più alto! */
+            font-family: 'Roboto', sans-serif;
+            /* Questa è la chicca! Una transizione per farla sparire soft.
+               Senza questa, boom! Sparisce di colpo ed è brutto. */
+            transition: opacity 0.5s ease-out;
+        }
 
+            /* Quando gli attacchiamo questa classe via JS, la facciamo sparire.
+           Opacity a zero per la transizione.
+           Pointer-events none è FONDAMENTALE: se non lo metti, anche se invisibile,
+           il div blocca i click sotto di lui. Tipo un fantasma che ti impedisce di cliccare. */
+            #initial-splash.hidden {
+                opacity: 0;
+                pointer-events: none;
+            }
+
+        /* Contenuto della splash. Non deve essere troppo elaborato.
+           Quel margin-top -100px è un trick per centrare "otticamente"
+           il logo un po' più in alto, perché l'occhio umano a volte
+           percepisce il centro geometrico come troppo in basso.
+           Pura UX, roba da smanettoni attenti ai dettagli. */
+        .splash-content {
+            text-align: center;
+            margin-top: -50px;
+        }
+
+        /* Il logo. Dimensione fissa, altrimenti esplode. */
+        .splash-logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 30px; /* Un po' di spazio sotto, non fa male */
+        }
+    </style>
+</head>
 <body>
+    <div id="initial-splash">
+        <div class="splash-content">
+            <img src="/images/plannerlogo.png" alt="PlannerApp Logo" class="splash-logo">
+        </div>
+    </div>
 
     <div id="app" style="background-color: transparent"></div>
-
     <div id="blazor-error-ui" style="background-color: #F5F6FA">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
+        Si è verificato un errore non gestito.
+        <a href="" class="reload">Ricarica</a>
         <a class="dismiss">🗙</a>
     </div>
 
     <script src="_framework/blazor.webview.js" autostart="false"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
 
-</body>
+    <script>
+        // Questa è la nostra funzione "ammazza-splash".
+        // Trova il div della splash e gli appiccica la classe 'hidden'.
+        // Poi, aspetta che la transizione finisca (quell'opacity 0.5s)
+        // e solo dopo lo toglie proprio dal DOM. Così non sta lì ad occupare spazio inutile.
+        function hideInitialSplash() {
+            const initialSplash = document.getElementById('initial-splash');
+            if (initialSplash) {
+                initialSplash.classList.add('hidden');
+                // Ascoltiamo l'evento 'transitionend' per essere sicuri che sia sparita prima di rimuoverla
+                initialSplash.addEventListener('transitionend', () => initialSplash.remove());
+            }
+        }
 
+        // Questo è il blocco di logica principale. Dobbiamo capire QUANDO Blazor è pronto.
+        // Abbiamo due scenari principali: MAUI Blazor e Blazor WebAssembly (per browser).
+
+        // Scenario 1: Siamo in MAUI Blazor? (controllo 'BlazorWebView' globale)
+        if (typeof BlazorWebView !== 'undefined') {
+            // Se sì, usiamo l'evento specifico di MAUI: 'onBlazorReady'.
+            // Questo è il momento perfetto per dire: "Ok, Blazor è su, nascondiamo la splash."
+            BlazorWebView.onBlazorReady = () => {
+                console.log("BlazorWebView è pronto. Nascondo la splash iniziale.");
+                hideInitialSplash();
+            };
+        }
+        // Scenario 2: Siamo in Blazor WebAssembly? (controllo 'Blazor' globale)
+        else if (typeof Blazor !== 'undefined') {
+            // Qui usiamo 'Blazor.start().then(() => {})'.
+            // Ricordi 'autostart="false"'? Qui gli diciamo "parti!"
+            // e SOLO quando è partito (la 'then' si attiva quando ha finito),
+            // nascondiamo la splash. È elegante e preciso.
+            Blazor.start().then(() => {
+                console.log("Blazor WebAssembly avviato. Nascondo la splash iniziale.");
+                hideInitialSplash();
+            });
+        }
+        // Fallback: Se per qualche motivo strano nessuno dei precedenti funziona (tipo in dev
+        // o se manca qualche script), nascondiamo la splash quando la pagina è completamente caricata.
+        // È meno preciso, ma almeno non resta lì per sempre.
+        else {
+            window.addEventListener('load', () => {
+                console.log("Finestra caricata. Nascondo la splash iniziale (fallback).");
+                hideInitialSplash();
+            });
+        }
+    </script>
+</body>
 </html>
