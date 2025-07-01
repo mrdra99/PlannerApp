@@ -75,8 +75,4 @@
       <ProjectReference Include="..\PlannerApp.Shared\PlannerApp.Shared.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Services\" />
-    </ItemGroup>
-
 </Project>
