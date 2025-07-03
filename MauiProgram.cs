@@ -4,6 +4,7 @@ using MudBlazor.Services;
 using PlannerApp.Services;
 using PlannerApp.Services.Interfaces;
 using PlannerApp.Shared.Data;
+using PlannerApp.ViewModels;
 
 namespace PlannerApp
 {
@@ -39,11 +40,9 @@ namespace PlannerApp
                 options.UseSqlite($"Filename={dbPath}");
             });
 
-            // 2. Registrazione del tuo TaskPlannerService
-            // Registra l'interfaccia ITaskPlannerService con la sua implementazione TaskPlannerService.
-            // AddSingleton è una buona scelta per i servizi che interagiscono con un DbContext locale
-            // in un'app mobile, garantendo una singola istanza per tutta la durata dell'applicazione.
+            //DI per i servizi, ViewModels e Repository
             builder.Services.AddSingleton<ITaskPlannerService, TaskPlannerService>();
+            builder.Services.AddSingleton<DashboardViewModel>();
 
             // --- FINE CONFIGURAZIONE EF CORE E SERVIZI ---
 

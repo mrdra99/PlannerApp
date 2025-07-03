@@ -1,7 +1,63 @@
 ﻿@page "/dashboard"
+@using PlannerApp.Shared.Models
+@inject NavigationManager NavManager
+@inject PlannerApp.ViewModels.DashboardViewModel dashboardVm
 
-<h3>Dashboard</h3>
+<MudText Typo="Typo.h4" GutterBottom="true">DashBoard</MudText>
 
-@code {
+@if (dashboardVm.IsLoading)
+{
+    <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+}
+else if (!dashboardVm.Tasks.Any())
+{
+    <MudText Typo="Typo.h2">Nessun evento trovato.</MudText>
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.AddCircle"
+               OnClick="@(() => NavManager.NavigateTo("/newEvent"))">
+        Nuovo Evento
+    </MudButton>
+}
+else
+{
+    <MudGrid Spacing="3" Justify="Justify.Center">
+        @foreach (var u in dashboardVm.Tasks)
+        {
+            <MudItem xs="12" sm="6" md="4">
+                <MudCard>
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h6" Color="Color.Primary">@u.Title</MudText>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudText Typo="Typo.subtitle1">@u.Category — Priority @u.Priority</MudText>
+                        <MudText Typo="Typo.body2">
+                            @u.StartDate.ToString("dd/MM/yyyy HH:mm") - @u.EndDate.ToString("dd/MM/yyyy HH:mm")
+                        </MudText>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
 
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.AddCircle"
+               OnClick="@(() => NavManager.NavigateTo("/newEvent"))">
+        Nuovo Evento
+    </MudButton>
+}
+
+
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await dashboardVm.LoadPlannerTasksAsync();
+    }
+
+    private void NavigateToNewPage()
+    {
+        NavManager.NavigateTo("/newEvent");
+    }
 }
