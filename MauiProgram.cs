@@ -40,9 +40,12 @@ namespace PlannerApp
                 options.UseSqlite($"Filename={dbPath}");
             });
 
-            //DI per i servizi, ViewModels e Repository
+            //Dependency Injection
             builder.Services.AddSingleton<ITaskPlannerService, TaskPlannerService>();
+
+            //View Models
             builder.Services.AddSingleton<DashboardViewModel>();
+            builder.Services.AddSingleton<NewEventViewModel>();
 
             // --- FINE CONFIGURAZIONE EF CORE E SERVIZI ---
 

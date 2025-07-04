@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlannerApp", "PlannerApp.csproj", "{C45220D0-1794-4077-8BBF-650076DB2355}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlannerApp.Shared", "..\PlannerApp.Shared\PlannerApp.Shared.csproj", "{EF364751-0A11-4F05-9097-6A0A1143D40C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C45220D0-1794-4077-8BBF-650076DB2355} = {C45220D0-1794-4077-8BBF-650076DB2355}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

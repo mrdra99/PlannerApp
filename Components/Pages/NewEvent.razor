@@ -1,7 +1,153 @@
-﻿@page "/newEvent"
+﻿@page "/newevent"
+@using PlannerApp.Shared.Models
+@inject NavigationManager NavManager
+@inject PlannerApp.ViewModels.NewEventViewModel NewEventViewModel
+@inject ISnackbar Snackbar
 
-<h3>NewEvent</h3>
+<MudContainer MaxWidth="MaxWidth.Small" Class="my-8">
+    <MudText Typo="Typo.h4" Align="Align.Center" GutterBottom="true">Crea un Nuovo Task</MudText>
+    <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="mb-6 mud-text-secondary">
+        Compila i campi per aggiungere un nuovo task al tuo planner.
+    </MudText>
+
+    <MudCard Elevation="4" Class="pa-6 rounded-lg">
+        <MudCardContent>
+            @* Mostra gli errori di validazione dal ViewModel se presenti *@
+            @if (NewEventViewModel.ValidationErrors != null && NewEventViewModel.ValidationErrors.Any())
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="mb-4 rounded-lg">
+                    <MudList Dense="true" T="string">
+                        @* Specifica T="string" *@
+                        @foreach (var error in NewEventViewModel.ValidationErrors)
+                        {
+                            <MudListItem Text="@error" Icon="@Icons.Material.Filled.ErrorOutline" T="string" /> @* Specifica T="string" *@
+                        }
+                    </MudList>
+                </MudAlert>
+            }
+
+            <MudForm @ref="_form" EnableIValidationTextFor="ValidationTextFor.Always">
+                <EditForm Model="@NewEventViewModel" OnValidSubmit="@SubmitForm">
+                    <DataAnnotationsValidator />
+                    <MudGrid Spacing="3">
+                        <MudItem xs="12">
+                            <MudTextField @bind-Value="NewEventViewModel.Title"
+                                          Label="Titolo"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          HelperText="Il titolo del tuo task (es. 'Comprare il pane')"
+                                          Required="true"
+                                          RequiredError="Il titolo è obbligatorio!" />
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudTextField @bind-Value="NewEventViewModel.Description"
+                                          Label="Descrizione"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          Lines="3"
+                                          HelperText="Dettagli aggiuntivi sul task" />
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudDatePicker Label="Data Inizio"
+                                           @bind-Date="NewEventViewModel.StartDate"
+                                           Variant="Variant.Outlined"
+                                           Margin="Margin.Dense"
+                                           Required="true"
+                                           RequiredError="La data di inizio è obbligatoria!" />
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudTimePicker Label="Ora Inizio"
+                                           @bind-Time="NewEventViewModel.StartTime" 
+                                           Variant="Variant.Outlined"
+                                           Margin="Margin.Dense"
+                                           Required="true"
+                                           RequiredError="L'ora di inizio è obbligatoria!" />
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudDatePicker Label="Data Fine"
+                                           @bind-Date="NewEventViewModel.EndDate" 
+                                           Variant="Variant.Outlined"
+                                           Margin="Margin.Dense"
+                                           Required="true"
+                                           RequiredError="La data di fine è obbligatoria!" />
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudTimePicker Label="Ora Fine"
+                                           @bind-Time="NewEventViewModel.EndTime" 
+                                           Variant="Variant.Outlined"
+                                           Margin="Margin.Dense"
+                                           Required="true"
+                                           RequiredError="L'ora di fine è obbligatoria!" />
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudTextField @bind-Value="NewEventViewModel.Category"
+                                          Label="Categoria"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          HelperText="Es. Lavoro, Personale, Studio" />
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudSelect T="PriorityLevel"
+                                       @bind-Value="NewEventViewModel.PriorityLevel"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       Label="Priorità"
+                                       Required="true"
+                                       RequiredError="La priorità è obbligatoria!">
+                                <MudSelectItem Value="PriorityLevel.Low">Bassa</MudSelectItem>
+                                <MudSelectItem Value="PriorityLevel.Medium">Media</MudSelectItem>
+                                <MudSelectItem Value="PriorityLevel.High">Alta</MudSelectItem>
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" Class="d-flex justify-end mt-4">
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Default"
+                                       OnClick="@Cancel"
+                                       Class="mr-2">
+                                Annulla
+                            </MudButton>
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       ButtonType="ButtonType.Submit"
+                                       Disabled="@NewEventViewModel.IsSaving">
+                                @if (NewEventViewModel.IsSaving)
+                                {
+                                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                }
+                                else
+                                {
+                                    <span>Salva Task</span>
+                                }
+                            </MudButton>
+                        </MudItem>
+                    </MudGrid>
+                </EditForm>
+            </MudForm>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
 
 @code {
+    private MudForm? _form;
 
+    private async Task SubmitForm()
+    {
+        bool success = await NewEventViewModel.SaveEventAsync();
+
+        if (success)
+        {
+            Snackbar.Add("Evento creato con successo!", Severity.Success);
+            NavManager.NavigateTo("/dashboard");
+        }
+        else
+        {
+            Snackbar.Add("Errore durante il salvataggio del task. Controlla i campi.", Severity.Error);
+        }
+    }
+
+    private void Cancel()
+    {
+        NewEventViewModel.ResetForm();
+        NavManager.NavigateTo("/dashboard");
+    }
 }
