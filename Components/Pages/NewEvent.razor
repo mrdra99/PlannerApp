@@ -1,4 +1,4 @@
-﻿@page "/newevent"
+﻿@page "/newEvent"
 @using PlannerApp.Shared.Models
 @inject NavigationManager NavManager
 @inject PlannerApp.ViewModels.NewEventViewModel NewEventViewModel
@@ -12,15 +12,14 @@
 
     <MudCard Elevation="4" Class="pa-6 rounded-lg">
         <MudCardContent>
-            @* Mostra gli errori di validazione dal ViewModel se presenti *@
+            @* Questo mostra gli errori di validazione dal ViewModel se esistenti *@
             @if (NewEventViewModel.ValidationErrors != null && NewEventViewModel.ValidationErrors.Any())
             {
                 <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="mb-4 rounded-lg">
                     <MudList Dense="true" T="string">
-                        @* Specifica T="string" *@
                         @foreach (var error in NewEventViewModel.ValidationErrors)
                         {
-                            <MudListItem Text="@error" Icon="@Icons.Material.Filled.ErrorOutline" T="string" /> @* Specifica T="string" *@
+                            <MudListItem Text="@error" Icon="@Icons.Material.Filled.ErrorOutline" T="string" /> @* Aggiunto T="string" *@
                         }
                     </MudList>
                 </MudAlert>
@@ -57,7 +56,7 @@
                         </MudItem>
                         <MudItem xs="6">
                             <MudTimePicker Label="Ora Inizio"
-                                           @bind-Time="NewEventViewModel.StartTime" 
+                                           @bind-Time="NewEventViewModel.StartTime"
                                            Variant="Variant.Outlined"
                                            Margin="Margin.Dense"
                                            Required="true"
@@ -65,7 +64,7 @@
                         </MudItem>
                         <MudItem xs="6">
                             <MudDatePicker Label="Data Fine"
-                                           @bind-Date="NewEventViewModel.EndDate" 
+                                           @bind-Date="NewEventViewModel.EndDate"
                                            Variant="Variant.Outlined"
                                            Margin="Margin.Dense"
                                            Required="true"
@@ -73,7 +72,7 @@
                         </MudItem>
                         <MudItem xs="6">
                             <MudTimePicker Label="Ora Fine"
-                                           @bind-Time="NewEventViewModel.EndTime" 
+                                           @bind-Time="NewEventViewModel.EndTime"
                                            Variant="Variant.Outlined"
                                            Margin="Margin.Dense"
                                            Required="true"
@@ -109,14 +108,14 @@
                             <MudButton Variant="Variant.Filled"
                                        Color="Color.Primary"
                                        ButtonType="ButtonType.Submit"
-                                       Disabled="@NewEventViewModel.IsSaving">
+                                       Disabled="@NewEventViewModel.IsSaving"> @* <-- Disabilita se sta salvando *@
                                 @if (NewEventViewModel.IsSaving)
                                 {
-                                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
                                 }
                                 else
                                 {
-                                    <span>Salva Task</span>
+                                        <span>Salva Task</span>
                                 }
                             </MudButton>
                         </MudItem>
@@ -126,28 +125,3 @@
         </MudCardContent>
     </MudCard>
 </MudContainer>
-
-@code {
-    private MudForm? _form;
-
-    private async Task SubmitForm()
-    {
-        bool success = await NewEventViewModel.SaveEventAsync();
-
-        if (success)
-        {
-            Snackbar.Add("Evento creato con successo!", Severity.Success);
-            NavManager.NavigateTo("/dashboard");
-        }
-        else
-        {
-            Snackbar.Add("Errore durante il salvataggio del task. Controlla i campi.", Severity.Error);
-        }
-    }
-
-    private void Cancel()
-    {
-        NewEventViewModel.ResetForm();
-        NavManager.NavigateTo("/dashboard");
-    }
-}
