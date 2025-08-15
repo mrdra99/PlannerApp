@@ -2,6 +2,7 @@
 @using PlannerApp.Components.Layout
 @using PlannerApp.Components
 @using PlannerApp.Components.Pages
+@inject NavigationManager NavManager
 
 @* Includo il componente Splash Screen, controllando la sua visibilità *@
 @if (showSplashScreen)
@@ -34,6 +35,7 @@
         await Task.Delay(500);
 
         showSplashScreen = false;
+        NavManager.NavigateTo("/dashboard");
         StateHasChanged();
     }
 }
