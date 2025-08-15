@@ -26,6 +26,7 @@ namespace PlannerApp.Shared.Models
     {
         Low,
         Medium,
-        High
+        High,
+        Emergency
     }
 }
